@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OrderManagementSystem.BL.EntityService.CustomerService;
-using OrderManagementSystem.BL.EntityService.EmailService;
 using OrderManagementSystem.BL.EntityService.InvoiceService;
 using OrderManagementSystem.BL.EntityService.OrderItemService;
 using OrderManagementSystem.BL.EntityService.OrderService;
@@ -20,6 +19,9 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using OrderManagementSystem.BL.Helper;
+using OrderManagementSystem.Settings;
+using static OrderManagementSystem.BL.Helper.EmailService;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,13 +56,10 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped(typeof(IUnitOfWork<>), typeof(UnitOfWork<>));
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-//builder.Services.AddScoped<Constants>();
 
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped< InvoiceService>();
 builder.Services.AddScoped<IOrderItemService, OrderItemService>();
-//builder.Services.AddScoped<IOrderService, OrderService>();
-//builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<EmailService>();
@@ -89,18 +88,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+            ValidIssuer = builder.Configuration["Jwt:iss"],
+            ValidAudience = builder.Configuration["Jwt:aud"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:jti"])),
+            RoleClaimType = ClaimTypes.Role
         };
     });
 
-builder.Services.AddSingleton(new MailHelper(
-    builder.Configuration["SmtpSettings:Server"],
-    int.Parse(builder.Configuration["SmtpSettings:Port"]),
-    builder.Configuration["SmtpSettings:Username"],
-    builder.Configuration["SmtpSettings:Password"]
-));
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+builder.Services.AddTransient<IEmailService, EmailService>();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+});
 
 var app = builder.Build();
 
@@ -128,13 +129,13 @@ async Task SeedData(IServiceProvider serviceProvider)
 
     // Ensure roles exist
     var roles = new[] { "Admin", "Customer" };
-    //foreach (var role in roles)
-    //{
-    //    if (!await roleManager.RoleExistsAsync(role))
-    //    {
-    //        await roleManager.CreateAsync(new IdentityRole<int>(role));
-    //    }
-    //}
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole<int>(role));
+        }
+    }
 
     // Ensure admin user exists
     var adminUser = await userManager.FindByNameAsync("wesammorsy");

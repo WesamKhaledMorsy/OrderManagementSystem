@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OrderManagementSystem.BL.EntityService.CustomerService;
 using OrderManagementSystem.BL.EntityService.UserService;
 using OrderManagementSystem.DL;
+using OrderManagementSystem.DL.Entities;
 using OrderManagementSystem.Models;
 
 namespace OrderManagementSystem.Controllers
@@ -13,11 +15,13 @@ namespace OrderManagementSystem.Controllers
     {
         private readonly IUserService _userService;
         private readonly ICustomerService _customerService;
+        private readonly UserManager<User>  _userManager;
 
-        public UserController(IUserService userService, ICustomerService customerService)
+        public UserController(IUserService userService, ICustomerService customerService, UserManager<User> userManager)
         {
             _userService = userService;
             _customerService = customerService;
+            _userManager=userManager;
         }
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel registerDto)
@@ -33,6 +37,11 @@ namespace OrderManagementSystem.Controllers
             {
                 var customerMap = new CustomerModel { Email=registerDto.Email, Name = registerDto.UserName };
                 var customer = _customerService.CreateNewCustomer(customerMap);
+                var someUser = await _userManager.FindByNameAsync(customer.Name);
+                if (someUser != null)
+                {
+                    await _userManager.AddToRoleAsync(someUser, "Customer");
+                }
                 return Ok(new { Message = "User registered successfully" });
             }
             else
@@ -58,76 +67,6 @@ namespace OrderManagementSystem.Controllers
             return Ok(new { Token = token });
         }
 
-        [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordModel forgotPasswordDto)
-        {
-            var result = await _userService.ForgotPasswordAsync(forgotPasswordDto.Email);
-
-            if (!result)
-            {
-                return BadRequest(new { Message = "Email not found" });
-            }
-
-            return Ok(new { Message = "Password reset email sent" });
-        }
-        //[HttpPost("register")]
-        //public async Task<IActionResult> Register([FromBody] RegisterModel model)
-        //{
-        //    if (ModelState.IsValid) {
-        //        //var user = new ApplicationUser
-        //        //{
-        //        //    Name = model.UserName,
-        //        //    UserName = model.UserName,
-        //        //    Email = model.Email
-        //        //};
-        //        var result = await _userService.RegisterAsync(model);
-        //        if (!result.Succeeded)
-        //        {
-        //            return  BadRequest(result.Errors); //Unauthorized()
-        //        }
-        //        return Ok("User registered successfully.");
-        //    }
-        //    return BadRequest();
-
-        //}
-
-        //[HttpPost("login")]
-        //public async Task<IActionResult> Login([FromBody] LoginModel model)
-        //{
-        //    var token = await _userService.LoginAsync(model);
-        //    if (token == null)
-        //    {
-        //        return Unauthorized("Invalid credentials.");
-        //    }
-
-        //    return Ok(new { Token = token });
-        //}
-
-        //[HttpPost("forgot-password")]
-        //public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordModel model)
-        //{
-        //    var token = await _userService.GeneratePasswordResetTokenAsync(model.Email);
-        //    if (token == null)
-        //    {
-        //        return BadRequest("Invalid Email.");
-        //    }
-
-        //    // Logic to send the token to user's email
-        //    // e.g., await _emailService.SendPasswordResetEmailAsync(model.Email, token);
-
-        //    return Ok("Password reset token sent to email.");
-        //}
-
-        //[HttpPost("reset-password")]
-        //public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
-        //{
-        //    var result = await _userService.ResetPasswordAsync(model);
-        //    if (!result.Succeeded)
-        //    {
-        //        return BadRequest(result.Errors);
-        //    }
-
-        //    return Ok("Password reset successfully.");
-        //}
+       
     }
 }

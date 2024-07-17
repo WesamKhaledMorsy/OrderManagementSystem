@@ -12,6 +12,6 @@ namespace OrderManagementSystem.DL.Entities
         [ForeignKey("OrderId")]
         public ICollection<OrderItem> OrderItems { get; set; }
         public string  PaymentMethod { get; set; }
-        public string Status { get; set; }
+        public int Status { get; set; }
     }
 }

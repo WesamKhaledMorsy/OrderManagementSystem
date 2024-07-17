@@ -11,6 +11,13 @@ namespace OrderManagementSystem.Models
         public decimal TotalAmount { get; set; }
         public ICollection<OrderItem>? OrderItems { get; set; }
         public string PaymentMethod { get; set; }
-        public string? Status { get; set; }
+        public int? Status { get; set; }
+    }
+
+    public enum OrderStatus
+    {
+        Ordered =1 ,
+        Shipping =2,
+        Delivered =3
     }
 }

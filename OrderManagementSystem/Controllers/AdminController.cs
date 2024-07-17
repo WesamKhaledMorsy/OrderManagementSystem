@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using OrderManagementSystem.BL.EntityService.EmailService;
 using OrderManagementSystem.BL.EntityService.OrderService;
 using OrderManagementSystem.BL.EntityService.ProductService;
 using OrderManagementSystem.DL;
@@ -12,37 +11,30 @@ using OrderManagementSystem.Models;
 using _Constants = OrderManagementSystem.Constants.Constants;
 namespace OrderManagementSystem.Controllers
 {
-
+    [Area("Admin")]
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
         private readonly AppDBContext _context;
-       // private readonly EmailService _emailService;
         private readonly _Constants _constants;
         private readonly ProductService _productService;
         private readonly OrderService _orderService;
 
-        public AdminController(AppDBContext context //, EmailService emailService 
+        public AdminController(AppDBContext context 
             ,ProductService productService
             ,_Constants constants, OrderService orderService)
         {
             _context = context;
-            //_emailService = emailService;
             _productService = productService;
             _constants = constants;
             _orderService = orderService;
         }
 
-        //[HttpGet("orders")]
-        //public async Task<IActionResult> GetAllOrders()
-        //{
-        //    var orders = await _context.Orders.Include(o => o.OrderItems).ToListAsync();
-        //    return Ok(orders);
-        //}
-
+        [Authorize(Roles = "Admin")]
         [HttpPut("orders/{orderId}/status")]
-        public async Task<IActionResult> UpdateOrderStatus(int orderId, [FromBody] string status)
+        public async Task<IActionResult> UpdateOrderStatus(int orderId, [FromBody] int status)
         {
             var order = await _context.Orders.FindAsync(orderId);
             if (order == null)
@@ -54,10 +46,10 @@ namespace OrderManagementSystem.Controllers
             await _context.SaveChangesAsync();
 
             var customer = await _context.Customers.FindAsync(order.CustomerId);
-            //if (customer != null)
-            //{
-            //    await _emailService.SendOrderStatusChangeEmailAsync(customer.Email, status);
-            //}
+            if (customer != null)
+            {
+                _orderService.SendApprovelEmail(customer, order);
+            }
 
             return Ok(order);
         }
@@ -110,6 +102,7 @@ namespace OrderManagementSystem.Controllers
             return Ok(product);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("orders")]
         public ActionResult GetAllOrders()
         {

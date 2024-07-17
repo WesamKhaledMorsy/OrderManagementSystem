@@ -5,7 +5,7 @@ namespace OrderManagementSystem.BL.EntityService.OrderService
 {
     public interface IOrderService
     {
-        Order CreateNewOrder(OrderModel order);
+         Task<Order> CreateNewOrder(OrderModel order);
         Order UpdateOrder (OrderModel order);
         IQueryable<Order> GetAllOrders();
         Order GetOrderById(int orderId);

@@ -37,7 +37,9 @@ namespace OrderManagementSystem.BL.EntityService.OrderItemService
             bool validOrder = ValidateOrderItemAsync(orderItemmap);
             if (validOrder)
             {
-                orderItemmap.Discount = (orderitem.UnitPrice * orderitem.Quantity) - ApplyDiscount(orderitem.UnitPrice * orderitem.Quantity);
+                var product = _dbContext.Products.Find(orderitem.ProductId);
+                orderitem.UnitPrice = product.Price;
+                //orderItemmap.Discount = (orderitem.UnitPrice * orderitem.Quantity) - ApplyDiscount(orderitem.UnitPrice * orderitem.Quantity);
                 var ReqResult = _IGenericRepository.Insert(orderItemmap);
                 _IUnitOfWork.Save();
                 UpdateProduct(orderitem.ProductId, orderitem.Quantity);

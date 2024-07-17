@@ -13,9 +13,6 @@ namespace OrderManagementSystem.Models
         [Compare("ConfirmPassword")]
         public string Password { get; set; }
         [Required]
-        public string ConfirmPassword { get; set; }
-        //public string ?Message { get; set; }
-        //public int ?MessageCode { get; set; }
-        //public string JWT { get; set; }
+        public string ConfirmPassword { get; set; }    
     }
 }

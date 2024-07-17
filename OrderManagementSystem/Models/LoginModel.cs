@@ -9,6 +9,5 @@ namespace OrderManagementSystem.Models
 
         [Required]
         public string Password { get; set; }
-        //public string JWT { get; set; }
     }
 }

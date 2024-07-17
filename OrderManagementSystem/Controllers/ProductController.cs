@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using OrderManagementSystem.BL.EntityService.EmailService;
 using OrderManagementSystem.BL.EntityService.ProductService;
 using OrderManagementSystem.DL;
 using _Constants = OrderManagementSystem.Constants.Constants;
@@ -31,7 +30,18 @@ namespace OrderManagementSystem.Controllers
             var products = _productService.GetAllProducts();
             string result = _constants.GetResponseGenericSuccess(products);
             return Content(result, _Constants.ContentTypeJson, System.Text.Encoding.UTF8);
-            //return Ok(products);
         }
+
+        [HttpGet("products/{productId}")]
+        public async Task<IActionResult> GetProductById(int productId)
+        {
+            var product = await _context.Products.FindAsync(productId);
+            if (product == null)
+            {
+                return NotFound();
+            }
+            return Ok(product);
+        }
+
     }
 }

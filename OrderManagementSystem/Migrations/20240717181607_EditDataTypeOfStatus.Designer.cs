@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OrderManagementSystem.DL;
 
@@ -11,9 +12,11 @@ using OrderManagementSystem.DL;
 namespace OrderManagementSystem.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240717181607_EditDataTypeOfStatus")]
+    partial class EditDataTypeOfStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -228,7 +231,7 @@ namespace OrderManagementSystem.Migrations
 
                     b.HasKey("CustomerId");
 
-                    b.ToTable("Customers", (string)null);
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("OrderManagementSystem.DL.Entities.Invoice", b =>
@@ -250,7 +253,7 @@ namespace OrderManagementSystem.Migrations
 
                     b.HasKey("InvoiceId");
 
-                    b.ToTable("Invoices", (string)null);
+                    b.ToTable("Invoices");
                 });
 
             modelBuilder.Entity("OrderManagementSystem.DL.Entities.Order", b =>
@@ -281,7 +284,7 @@ namespace OrderManagementSystem.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("OrderManagementSystem.DL.Entities.OrderItem", b =>
@@ -311,7 +314,7 @@ namespace OrderManagementSystem.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderItems", (string)null);
+                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("OrderManagementSystem.DL.Entities.Product", b =>
@@ -334,7 +337,7 @@ namespace OrderManagementSystem.Migrations
 
                     b.HasKey("ProductId");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("OrderManagementSystem.DL.Entities.User", b =>
