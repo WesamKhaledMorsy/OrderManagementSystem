@@ -96,12 +96,24 @@ namespace OrderManagementSystem.Controllers
         [HttpGet("products/{productId}")]
         public async Task<IActionResult> GetProductById(int productId)
         {
-            var product = await _context.Products.FindAsync(productId);
-            if (product == null)
+            //var product = await _context.Products.FindAsync(productId);
+            //if (product == null)
+            //{
+            //    return NotFound();
+            //}
+            //return Ok(product);
+            try
             {
-                return NotFound();
+                var Response = _orderService.GetOrderById(productId);
+                string result = _constants.GetResponseGenericSuccess(Response);
+                return Content(result, _Constants.ContentTypeJson, System.Text.Encoding.UTF8);
+
             }
-            return Ok(product);
+            catch (Exception ex)
+            {
+                string result = _constants.GetResponseError(ex.Message);
+                return Content(result, _Constants.ContentTypeJson, System.Text.Encoding.UTF8);
+            }
         }
 
         [HttpGet("orders")]

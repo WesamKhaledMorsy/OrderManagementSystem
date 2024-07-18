@@ -120,10 +120,11 @@ namespace UnitTest.Tests.Controller
         public void AdminControllerTests_AddProduct_ReturnsContentResultWithSuccess()
         {
             // Arrange
-            var productModel = new ProductModel { ProductId = 1, Name = "Product 1", Price = 100, Stock = 10 };
+            var productId = 1;
+            var productModel = new ProductModel { ProductId = productId, Name = "Product 1", Price = 100, Stock = 10 };
             var product = new Product()
             {
-                ProductId = productModel.ProductId, 
+                ProductId = productModel.ProductId,
                 Name = productModel.Name,
                 Price = productModel.Price,
                 Stock = productModel.Stock
@@ -141,7 +142,8 @@ namespace UnitTest.Tests.Controller
         public async Task AdminControllerTests_GetProductById_ReturnsOkResult()
         {
             // Arrange
-            var productModel = new ProductModel { ProductId = 1, Name = "Product 1", Price = 100, Stock = 10 };
+            var productId = 1;
+            var productModel = new ProductModel { ProductId = productId, Name = "Product 1", Price = 100, Stock = 10 };
             var product = new Product()
             {
                 ProductId = productModel.ProductId,
@@ -152,7 +154,7 @@ namespace UnitTest.Tests.Controller
             _productServiceMock.Setup(s => s.CreateNewProduct(productModel)).Returns(product);
 
             // Act
-            var result = await _adminController.GetProductById(product.ProductId);
+            var result = await _adminController.GetProductById(productId);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
