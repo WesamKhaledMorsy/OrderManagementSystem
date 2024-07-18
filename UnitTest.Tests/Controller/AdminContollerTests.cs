@@ -121,7 +121,13 @@ namespace UnitTest.Tests.Controller
         {
             // Arrange
             var productModel = new ProductModel { ProductId = 1, Name = "Product 1", Price = 100, Stock = 10 };
-            var product = _mapper.Object.Map<Product>(productModel);
+            var product = new Product()
+            {
+                ProductId = productModel.ProductId, 
+                Name = productModel.Name,
+                Price = productModel.Price,
+                Stock = productModel.Stock
+            };
             _productServiceMock.Setup(s => s.CreateNewProduct(productModel)).Returns(product);           
 
             // Act
@@ -136,7 +142,13 @@ namespace UnitTest.Tests.Controller
         {
             // Arrange
             var productModel = new ProductModel { ProductId = 1, Name = "Product 1", Price = 100, Stock = 10 };
-            var product = _mapper.Object.Map<Product>(productModel);
+            var product = new Product()
+            {
+                ProductId = productModel.ProductId,
+                Name = productModel.Name,
+                Price = productModel.Price,
+                Stock = productModel.Stock
+            };
             _productServiceMock.Setup(s => s.CreateNewProduct(productModel)).Returns(product);
 
             // Act
