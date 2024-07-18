@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OrderManagementSystem.BL.EntityService.CustomerService;
 using OrderManagementSystem.BL.EntityService.OrderService;
 using OrderManagementSystem.BL.EntityService.ProductService;
 using OrderManagementSystem.DL;
@@ -23,37 +24,42 @@ namespace OrderManagementSystem.Controllers
         private readonly IProductService _productService;
         private readonly IOrderService _orderService;
         private readonly IMapper _mapper;
-
+        private readonly ICustomerService _customerService;
         public AdminController(AppDBContext context 
             ,IProductService productService
-            ,_Constants constants, IOrderService orderService ,IMapper mapper)
+            ,_Constants constants, IOrderService orderService 
+            ,IMapper mapper
+            , ICustomerService customerService)
         {
             _context = context;
             _productService = productService;
             _constants = constants;
             _orderService = orderService;
             _mapper = mapper;
+            _customerService = customerService;
         }
 
         [HttpPut("orders/{orderId}/status")]
         public async Task<IActionResult> UpdateOrderStatus(int orderId, [FromBody] int status)
         {
-            var order = await _context.Orders.FindAsync(orderId);
-            if (order == null)
+            try
             {
-                return NotFound();
+                var Response = _orderService.UpdateOrderStatus(orderId, status);
+                string result = _constants.GetResponseGenericSuccess(Response);
+                //var order = _orderService.GetOrderById(orderId);
+               var customer =_customerService.GetCustomer(Response.CustomerId);
+                if (customer != null)
+                {
+                    _orderService.SendApprovelEmail(customer, Response);
+                }
+                return Content(result, _Constants.ContentTypeJson, System.Text.Encoding.UTF8);
+
             }
-
-            order.Status = status;
-            await _context.SaveChangesAsync();
-
-            var customer = await _context.Customers.FindAsync(order.CustomerId);
-            if (customer != null)
+            catch (Exception ex)
             {
-                _orderService.SendApprovelEmail(customer, order);
-            }
-
-            return Ok(order);
+                string result = _constants.GetResponseError(ex.Message);
+                return Content(result, _Constants.ContentTypeJson, System.Text.Encoding.UTF8);
+            }          
         }
 
        

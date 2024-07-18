@@ -39,7 +39,9 @@ namespace OrderManagementSystem.BL.EntityService.CustomerService
             _IUnitOfWork.Save();
             return ReqResult;            
         }
-
+        public Customer GetCustomer(int id) { 
+            return _IGenericRepository.GetById(id);
+        }
         public IQueryable<Order> GetAllOrdersOfCustomer(int customerId)
         {
             var orderList = _dbContext.Orders.Where(x => x.CustomerId == customerId);   

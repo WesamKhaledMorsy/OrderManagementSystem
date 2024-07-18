@@ -124,6 +124,15 @@ namespace OrderManagementSystem.BL.EntityService.OrderService
             _IUnitOfWork.Save();
             return ReqResult;
         }
+        public Order UpdateOrderStatus(int orderId, int status)
+        {
+            var order = _IGenericRepository.GetById(orderId);
+            order.Status = status;
+
+            var ReqResult = _IGenericRepository.Update(order);
+            _IUnitOfWork.Save();
+            return ReqResult;
+        }
 
         public IQueryable<Order> GetAllOrders()
         {

@@ -7,5 +7,6 @@ namespace OrderManagementSystem.BL.EntityService.CustomerService
     {
        Customer CreateNewCustomer(CustomerModel customer);
         IQueryable<Order> GetAllOrdersOfCustomer (int customerId);
+        Customer GetCustomer (int customerId);
     }
 }
