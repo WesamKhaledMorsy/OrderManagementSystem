@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -14,25 +15,26 @@ namespace OrderManagementSystem.Controllers
     [Area("Admin")]
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
         private readonly AppDBContext _context;
         private readonly _Constants _constants;
-        private readonly ProductService _productService;
-        private readonly OrderService _orderService;
+        private readonly IProductService _productService;
+        private readonly IOrderService _orderService;
+        private readonly IMapper _mapper;
 
         public AdminController(AppDBContext context 
-            ,ProductService productService
-            ,_Constants constants, OrderService orderService)
+            ,IProductService productService
+            ,_Constants constants, IOrderService orderService ,IMapper mapper)
         {
             _context = context;
             _productService = productService;
             _constants = constants;
             _orderService = orderService;
+            _mapper = mapper;
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpPut("orders/{orderId}/status")]
         public async Task<IActionResult> UpdateOrderStatus(int orderId, [FromBody] int status)
         {
@@ -102,7 +104,6 @@ namespace OrderManagementSystem.Controllers
             return Ok(product);
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpGet("orders")]
         public ActionResult GetAllOrders()
         {
@@ -118,8 +119,6 @@ namespace OrderManagementSystem.Controllers
                 string result = _constants.GetResponseError(ex.Message);
                 return Content(result, _Constants.ContentTypeJson, System.Text.Encoding.UTF8);
             }
-
-
         }
 
     }

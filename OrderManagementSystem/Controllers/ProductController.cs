@@ -13,9 +13,9 @@ namespace OrderManagementSystem.Controllers
     {
         private readonly AppDBContext _context;
         private readonly _Constants _constants;
-        private readonly ProductService _productService;
+        private readonly IProductService _productService;
 
-        public ProductController(AppDBContext context, ProductService productService
+        public ProductController(AppDBContext context, IProductService productService
             , _Constants constants)
         {
             _context = context;

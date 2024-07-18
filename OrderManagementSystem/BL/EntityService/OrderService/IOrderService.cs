@@ -11,7 +11,7 @@ namespace OrderManagementSystem.BL.EntityService.OrderService
         Order GetOrderById(int orderId);
         bool ValidateOrderAsync(OrderModel order);
 
-       
+        void SendApprovelEmail(Customer customer, Order order);
 
     }
 }
